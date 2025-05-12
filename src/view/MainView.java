@@ -13,14 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainView extends JFrame {
-    private List<Node> nodes = List.of(
-            new Node(1, 1),
-            new Node(2, 2),
-            new Node(3, 3),
-            new Node(5, 4),
-            new Node(6, 5),
-            new Node(7, 6)
-    );
+    private List<Node> nodes;
 
     public MainView() {
         createMainViewWindow();
