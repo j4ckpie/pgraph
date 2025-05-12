@@ -1,12 +1,27 @@
 package view;
 
+import model.Node;
+import util.FileReader;
+
 import javax.swing.*;
+import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainView extends JFrame {
+    private List<Node> nodes = List.of(
+            new Node(1, 1),
+            new Node(2, 2),
+            new Node(3, 3),
+            new Node(5, 4),
+            new Node(6, 5),
+            new Node(7, 6)
+    );
+
     public MainView() {
         createMainViewWindow();
     }
@@ -14,7 +29,8 @@ public class MainView extends JFrame {
     private void createMainViewWindow() {
         // Basic config
         setTitle("pgraph");
-        setSize(800, 600);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setUndecorated(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -63,6 +79,14 @@ public class MainView extends JFrame {
         setVisible(true);
     }
 
+    // Create view for imported view
+    private void createImportGraphView(int size) {
+        GraphPanel graphPanel = new GraphPanel(size, size, nodes);
+        JScrollPane scrollPane = new JScrollPane(graphPanel);
+        add(scrollPane);
+        setVisible(true);
+    }
+
     // Create new app window
     private void newWindow() {
         dispose();
@@ -74,6 +98,14 @@ public class MainView extends JFrame {
         MainFileChooser chooser = new MainFileChooser();
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
+            nodes = FileReader.readFile(file);
+            int maxNode = 0;
+            for(Node node : nodes) {
+                if(node.getId() > maxNode) {
+                    maxNode = node.getId();
+                }
+            }
+            createImportGraphView((int)Math.ceil(Math.sqrt(maxNode)));
         }
     }
 
