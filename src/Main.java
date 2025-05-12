@@ -1,7 +1,14 @@
 import view.MainView;
 
+import javax.swing.*;
+
 public class Main {
     public static void main(String[] args) {
-        new MainView();
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new MainView();
+            }
+        });
     }
 }
