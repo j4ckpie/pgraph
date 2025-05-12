@@ -33,8 +33,8 @@ public class MainView extends JFrame {
         MainMenu settings = new MainMenu("settings");
         MainMenu help = new MainMenu("help");
         MainMenuItem newItem = new MainMenuItem("new");
-        MainMenuItem importItem = new MainMenuItem("import");
-        MainMenuItem exportItem = new MainMenuItem("export");
+        MainMenuItem importDividedItem = new MainMenuItem("import divided");
+        MainMenuItem importRawItem = new MainMenuItem("import raw");
         MainMenuItem exitItem = new MainMenuItem("exit");
         MainMenuItem fontSmallItem = new MainMenuItem("font 16pt");
         MainMenuItem fontMediumItem = new MainMenuItem("font 20pt");
@@ -44,8 +44,8 @@ public class MainView extends JFrame {
 
         // Add components
         menu.add(newItem);
-        menu.add(importItem);
-        menu.add(exportItem);
+        menu.add(importDividedItem);
+        menu.add(importRawItem);
         menu.add(exitItem);
         settings.add(fontSmallItem);
         settings.add(fontMediumItem);
@@ -59,8 +59,8 @@ public class MainView extends JFrame {
 
         // Actions
         newItem.addActionListener(e -> newWindow());
-        importItem.addActionListener(e -> importGraph());
-        exportItem.addActionListener(e -> exportGraph());
+        importDividedItem.addActionListener(e -> importDividedGraph());
+        importRawItem.addActionListener(e -> importRawGraph());
         exitItem.addActionListener(e -> exitWindow());
         fontSmallItem.addActionListener(e -> setFontSmall());
         fontMediumItem.addActionListener(e -> setFontMedium());
@@ -87,7 +87,7 @@ public class MainView extends JFrame {
     }
 
     // Import graph from file
-    private void importGraph() {
+    private void importDividedGraph() {
         MainFileChooser chooser = new MainFileChooser();
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
@@ -102,19 +102,11 @@ public class MainView extends JFrame {
         }
     }
 
-    // Export graph to file
-    private void exportGraph(/* data */) {
+    // Import raw graph to file
+    private void importRawGraph() {
         MainFileChooser chooser = new MainFileChooser();
-        if(chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+        if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
-
-            // Write data to file
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-                writer.write("" /* data */);
-                JOptionPane.showMessageDialog(null, "Saved to file\n" + file.getAbsolutePath());
-            } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, "Cannot save to file", "Error", JOptionPane.ERROR_MESSAGE);
-            }
         }
     }
 
