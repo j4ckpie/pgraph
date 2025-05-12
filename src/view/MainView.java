@@ -1,9 +1,10 @@
 package view;
 
-import com.sun.tools.javac.Main;
-
 import javax.swing.*;
-import java.awt.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class MainView extends JFrame {
     public MainView() {
@@ -26,9 +27,9 @@ public class MainView extends JFrame {
         MainMenuItem importItem = new MainMenuItem("import");
         MainMenuItem exportItem = new MainMenuItem("export");
         MainMenuItem exitItem = new MainMenuItem("exit");
-        MainMenuItem fontSmallItem = new MainMenuItem("font 16px");
-        MainMenuItem fontMediumItem = new MainMenuItem("font 20px");
-        MainMenuItem fontLargeItem = new MainMenuItem("font 24px");
+        MainMenuItem fontSmallItem = new MainMenuItem("font 16pt");
+        MainMenuItem fontMediumItem = new MainMenuItem("font 20pt");
+        MainMenuItem fontLargeItem = new MainMenuItem("font 24pt");
         MainMenuItem aboutItem = new MainMenuItem("about");
         MainMenuItem creditsItem = new MainMenuItem("credits");
 
@@ -70,12 +71,26 @@ public class MainView extends JFrame {
 
     // Import graph from file
     private void importGraph() {
-        throw new UnsupportedOperationException("Not supported yet");
+        MainFileChooser chooser = new MainFileChooser();
+        if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+        }
     }
 
     // Export graph to file
-    private void exportGraph() {
-        throw new UnsupportedOperationException("Not supported yet");
+    private void exportGraph(/* data */) {
+        MainFileChooser chooser = new MainFileChooser();
+        if(chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+
+            // Write data to file
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                writer.write("" /* data */);
+                JOptionPane.showMessageDialog(null, "Saved to file\n" + file.getAbsolutePath());
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Cannot save to file", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     // Exit the app
