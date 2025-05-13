@@ -1,6 +1,7 @@
 package view;
 
 import model.Node;
+import util.ValueHelper;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,7 +13,7 @@ public class GraphPanel extends JPanel {
     private final int COLOR_AMOUNT = 8;
     private int rows;
     private int cols;
-    private final int cellSize = 15;
+    private int cellSize = 15;
     private List<Node> nodes;
     private List<Color> palette;
 
@@ -20,6 +21,11 @@ public class GraphPanel extends JPanel {
         this.rows = rows;
         this.cols = cols;
         this.nodes = nodes;
+
+        // Set cell size
+        cellSize = (int)ValueHelper.clamp((double)Toolkit.getDefaultToolkit().getScreenSize().width / cols, 15.0, 50.0);
+
+        // Basic Config
         setBackground(Color.DARK_GRAY);
         setPreferredSize(new Dimension(cols * cellSize, rows * cellSize));
         generateColorPalette(COLOR_AMOUNT);
@@ -65,5 +71,4 @@ public class GraphPanel extends JPanel {
             palette.add(Color.getHSBColor(hue, saturation, brightness));
         }
     }
-
 }
