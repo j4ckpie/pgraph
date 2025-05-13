@@ -55,7 +55,7 @@ public class GraphPanel extends JPanel {
             int drawX = y * cellSize + (cellSize - nodeSize) / 2;
             int drawY = x * cellSize + (cellSize - nodeSize) / 2;
 
-            g2d.setColor(palette.get(nodeGroup % 32));
+            g2d.setColor(palette.get(nodeGroup % 8));
             g2d.fillOval(drawX, drawY, nodeSize, nodeSize);
         }
     }
