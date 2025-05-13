@@ -25,6 +25,7 @@ public class MainView extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setUndecorated(true);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        getContentPane().setBackground(Color.DARK_GRAY);
         setLocationRelativeTo(null);
 
         // Create components
@@ -83,12 +84,14 @@ public class MainView extends JFrame {
     // Create new app window
     private void newWindow() {
         dispose();
+        getContentPane().removeAll();
         createMainViewWindow();
     }
 
     // Import graph from file
     private void importDividedGraph() {
         MainFileChooser chooser = new MainFileChooser();
+        chooser.setCurrentDirectory(new File("../pgraph/"));
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
             nodes = FileReader.readFile(file);
@@ -105,6 +108,7 @@ public class MainView extends JFrame {
     // Import raw graph to file
     private void importRawGraph() {
         MainFileChooser chooser = new MainFileChooser();
+        chooser.setCurrentDirectory(new File("../pgraph/"));
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
         }
