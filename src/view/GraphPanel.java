@@ -18,6 +18,9 @@ public class GraphPanel extends JPanel {
     private List<Color> palette;
 
     public GraphPanel(int cols, int rows, List<Node> nodes) {
+        // Clear before drawing
+        removeAll();
+        
         this.rows = rows;
         this.cols = cols;
         this.nodes = nodes;
