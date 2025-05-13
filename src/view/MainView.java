@@ -101,6 +101,8 @@ public class MainView extends JFrame {
                     maxNode = node.getId();
                 }
             }
+            // Clear panel before drawing new
+            getContentPane().removeAll();
             createImportGraphView((int)Math.ceil(Math.sqrt(maxNode)));
         }
     }
