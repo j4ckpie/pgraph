@@ -1,19 +1,24 @@
 package view;
 
+import model.ImportType;
 import model.Node;
+import model.Status;
 import util.FileReader;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainView extends JFrame {
     private List<Node> nodes;
+    private int maxNode = 0;
+    private MainScrollPane scrollPane;
+    private ArgsButton generateButton;
+    private ArgsLabel status;
+    private ArgsTextField k;
+    private ArgsTextField x;
+    private ImportType importType;
 
     public MainView() {
         createMainViewWindow();
@@ -42,6 +47,13 @@ public class MainView extends JFrame {
         MainMenuItem fontLargeItem = new MainMenuItem("font 24pt");
         MainMenuItem aboutItem = new MainMenuItem("about");
         MainMenuItem creditsItem = new MainMenuItem("credits");
+        ArgsPanel argsPanel = new ArgsPanel();
+        generateButton = new ArgsButton("Generate");
+        k = new ArgsTextField();
+        x = new ArgsTextField();
+        ArgsLabel kLabel = new ArgsLabel("Parts [k]: ");
+        ArgsLabel xLabel = new ArgsLabel("Margin percentage [x]: ");
+        status = new ArgsLabel(Status.GRAPH_NOT_LODAED.toString());
 
         // Add components
         menu.add(newItem);
@@ -57,6 +69,17 @@ public class MainView extends JFrame {
         menuBar.add(settings);
         menuBar.add(help);
         setJMenuBar(menuBar);
+        argsPanel.add(kLabel);
+        argsPanel.add(k);
+        argsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        argsPanel.add(xLabel);
+        argsPanel.add(x);
+        argsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        generateButton.setEnabled(false);
+        argsPanel.add(generateButton);
+        argsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        argsPanel.add(status);
+        add(argsPanel, BorderLayout.SOUTH);
 
         // Actions
         newItem.addActionListener(e -> newWindow());
@@ -68,16 +91,25 @@ public class MainView extends JFrame {
         fontLargeItem.addActionListener(e -> setFontLarge());
         aboutItem.addActionListener(e -> aboutWindow());
         creditsItem.addActionListener(e -> creditsWindow());
+        generateButton.addActionListener(e -> drawGraph());
 
         // Render window
         setVisible(true);
     }
 
+    // Draw graph on screen
+    private void drawGraph() {
+        switch(importType) {
+            case DIVIDED -> createImportGraphView((int)Math.ceil(Math.sqrt(maxNode)));
+            case RAW -> throw new UnsupportedOperationException("Not supported yet!");
+        }
+    }
+
     // Create view for imported view
     private void createImportGraphView(int size) {
         GraphPanel graphPanel = new GraphPanel(size, size, nodes);
-        JScrollPane scrollPane = new JScrollPane(graphPanel);
-        add(scrollPane);
+        scrollPane = new MainScrollPane(graphPanel);
+        add(scrollPane, BorderLayout.CENTER);
         setVisible(true);
     }
 
@@ -95,15 +127,24 @@ public class MainView extends JFrame {
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
             nodes = FileReader.readFile(file);
-            int maxNode = 0;
             for(Node node : nodes) {
                 if(node.getId() > maxNode) {
                     maxNode = node.getId();
                 }
             }
+
             // Clear panel before drawing new
-            getContentPane().removeAll();
-            createImportGraphView((int)Math.ceil(Math.sqrt(maxNode)));
+            if(scrollPane != null) {
+                getContentPane().remove(scrollPane);
+            }
+
+            importType = ImportType.DIVIDED;
+            generateButton.setEnabled(true);
+            status.setText(Status.DIVIDED_GRAPH_LOADED.toString());
+            k.setText("");
+            k.setEnabled(false);
+            x.setText("");
+            x.setEnabled(false);
         }
     }
 
