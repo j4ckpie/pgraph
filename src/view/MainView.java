@@ -1,20 +1,24 @@
 package view;
 
+import model.ImportType;
 import model.Node;
+import model.Status;
 import util.FileReader;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainView extends JFrame {
     private List<Node> nodes;
+    private int maxNode = 0;
     private MainScrollPane scrollPane;
+    private ArgsButton generateButton;
+    private ArgsLabel status;
+    private ArgsTextField k;
+    private ArgsTextField x;
+    private ImportType importType;
 
     public MainView() {
         createMainViewWindow();
@@ -44,12 +48,12 @@ public class MainView extends JFrame {
         MainMenuItem aboutItem = new MainMenuItem("about");
         MainMenuItem creditsItem = new MainMenuItem("credits");
         ArgsPanel argsPanel = new ArgsPanel();
-        ArgsButton generateButton = new ArgsButton("Generate");
-        ArgsTextField k = new ArgsTextField();
-        ArgsTextField x = new ArgsTextField();
+        generateButton = new ArgsButton("Generate");
+        k = new ArgsTextField();
+        x = new ArgsTextField();
         ArgsLabel kLabel = new ArgsLabel("Parts [k]: ");
         ArgsLabel xLabel = new ArgsLabel("Margin percentage [x]: ");
-        ArgsLabel status = new ArgsLabel("Status: Graph not loaded!");
+        status = new ArgsLabel(Status.GRAPH_NOT_LODAED.toString());
 
         // Add components
         menu.add(newItem);
@@ -87,9 +91,18 @@ public class MainView extends JFrame {
         fontLargeItem.addActionListener(e -> setFontLarge());
         aboutItem.addActionListener(e -> aboutWindow());
         creditsItem.addActionListener(e -> creditsWindow());
+        generateButton.addActionListener(e -> drawGraph());
 
         // Render window
         setVisible(true);
+    }
+
+    // Draw graph on screen
+    private void drawGraph() {
+        switch(importType) {
+            case DIVIDED -> createImportGraphView((int)Math.ceil(Math.sqrt(maxNode)));
+            case RAW -> throw new UnsupportedOperationException("Not supported yet!");
+        }
     }
 
     // Create view for imported view
@@ -114,17 +127,24 @@ public class MainView extends JFrame {
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
             nodes = FileReader.readFile(file);
-            int maxNode = 0;
             for(Node node : nodes) {
                 if(node.getId() > maxNode) {
                     maxNode = node.getId();
                 }
             }
+
             // Clear panel before drawing new
             if(scrollPane != null) {
                 getContentPane().remove(scrollPane);
             }
-            createImportGraphView((int)Math.ceil(Math.sqrt(maxNode)));
+
+            importType = ImportType.DIVIDED;
+            generateButton.setEnabled(true);
+            status.setText(Status.DIVIDED_GRAPH_LOADED.toString());
+            k.setText("");
+            k.setEnabled(false);
+            x.setText("");
+            x.setEnabled(false);
         }
     }
 
