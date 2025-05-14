@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MainView extends JFrame {
     private List<Node> nodes;
-    private int maxNode = 0;
+    private int maxNode;
     private MainScrollPane scrollPane;
     private ArgsButton generateButton;
     private ArgsLabel status;
@@ -127,11 +127,14 @@ public class MainView extends JFrame {
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
             nodes = FileReader.readFile(file);
+            maxNode = 0;
             for(Node node : nodes) {
                 if(node.getId() > maxNode) {
                     maxNode = node.getId();
                 }
             }
+
+            System.out.println(maxNode);
 
             // Clear panel before drawing new
             if(scrollPane != null) {
