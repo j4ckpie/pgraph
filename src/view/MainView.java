@@ -14,6 +14,7 @@ import java.util.List;
 
 public class MainView extends JFrame {
     private List<Node> nodes;
+    private MainScrollPane scrollPane;
 
     public MainView() {
         createMainViewWindow();
@@ -42,6 +43,13 @@ public class MainView extends JFrame {
         MainMenuItem fontLargeItem = new MainMenuItem("font 24pt");
         MainMenuItem aboutItem = new MainMenuItem("about");
         MainMenuItem creditsItem = new MainMenuItem("credits");
+        ArgsPanel argsPanel = new ArgsPanel();
+        ArgsButton generateButton = new ArgsButton("Generate");
+        ArgsTextField k = new ArgsTextField();
+        ArgsTextField x = new ArgsTextField();
+        ArgsLabel kLabel = new ArgsLabel("Parts [k]: ");
+        ArgsLabel xLabel = new ArgsLabel("Margin percentage [x]: ");
+        ArgsLabel status = new ArgsLabel("Status: Graph not loaded!");
 
         // Add components
         menu.add(newItem);
@@ -57,6 +65,17 @@ public class MainView extends JFrame {
         menuBar.add(settings);
         menuBar.add(help);
         setJMenuBar(menuBar);
+        argsPanel.add(kLabel);
+        argsPanel.add(k);
+        argsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        argsPanel.add(xLabel);
+        argsPanel.add(x);
+        argsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        generateButton.setEnabled(false);
+        argsPanel.add(generateButton);
+        argsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
+        argsPanel.add(status);
+        add(argsPanel, BorderLayout.SOUTH);
 
         // Actions
         newItem.addActionListener(e -> newWindow());
@@ -76,8 +95,8 @@ public class MainView extends JFrame {
     // Create view for imported view
     private void createImportGraphView(int size) {
         GraphPanel graphPanel = new GraphPanel(size, size, nodes);
-        JScrollPane scrollPane = new JScrollPane(graphPanel);
-        add(scrollPane);
+        scrollPane = new MainScrollPane(graphPanel);
+        add(scrollPane, BorderLayout.CENTER);
         setVisible(true);
     }
 
@@ -102,7 +121,9 @@ public class MainView extends JFrame {
                 }
             }
             // Clear panel before drawing new
-            getContentPane().removeAll();
+            if(scrollPane != null) {
+                getContentPane().remove(scrollPane);
+            }
             createImportGraphView((int)Math.ceil(Math.sqrt(maxNode)));
         }
     }
