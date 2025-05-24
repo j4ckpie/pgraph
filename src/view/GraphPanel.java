@@ -1,6 +1,7 @@
 package view;
 
 import model.Node;
+import util.RawGraph;
 import util.ValueHelper;
 
 import javax.swing.*;
@@ -16,14 +17,16 @@ public class GraphPanel extends JPanel {
     private int cellSize = 15;
     private List<Node> nodes;
     private List<Color> palette;
+    public RawGraph rawGraph;
 
-    public GraphPanel(int cols, int rows, List<Node> nodes) {
+    public GraphPanel(int cols, int rows, List<Node> nodes, RawGraph rawGraph) {
         // Clear before drawing
         removeAll();
         
         this.rows = rows;
         this.cols = cols;
         this.nodes = nodes;
+        this.rawGraph = rawGraph;
 
         // Set cell size
         cellSize = (int)ValueHelper.clamp((double)Toolkit.getDefaultToolkit().getScreenSize().width / cols, 15.0, 50.0);
@@ -45,6 +48,33 @@ public class GraphPanel extends JPanel {
         }
         for (int col = 0; col <= cols; col++) {
             g2d.drawLine(col * cellSize, 0, col * cellSize, rows * cellSize);
+        }
+
+        // Draw edges
+        g2d.setStroke(new BasicStroke(0.1f));
+        if(rawGraph != null){
+            for(int i=0;i<rawGraph.getN();i++){
+                for(Integer j : rawGraph.getAdj().get(i)){
+                    Node u = rawGraph.getNodes().get(i);
+                    Node v = rawGraph.getNodes().get(j);
+                    if(v.getId() < u.getId()) continue;
+                    int nodevId = v.getId();
+                    int nodeuId = u.getId();
+                    int nodevGroup = v.getGroup();
+                    int nodeuGroup = u.getGroup();
+                    int xv = (nodevId - 1) / cols;
+                    int yv = (nodevId - 1) % cols;
+                    int xu = (nodeuId - 1) / cols;
+                    int yu = (nodeuId - 1) % cols;
+
+                    int drawvX = yv * cellSize + (cellSize) / 2;
+                    int drawvY = xv * cellSize + (cellSize) / 2;
+                    int drawuX = yu * cellSize + (cellSize) / 2;
+                    int drawuY = xu * cellSize + (cellSize) / 2;
+                    g2d.setColor(nodevGroup == nodeuGroup ? palette.get(nodevGroup % 8) : Color.BLACK);
+                    g2d.drawLine(drawvX, drawvY, drawuX, drawuY);
+                }
+            }
         }
 
         // Draw nodes

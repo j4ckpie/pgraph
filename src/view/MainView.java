@@ -4,10 +4,14 @@ import model.ImportType;
 import model.Node;
 import model.Status;
 import util.FileReader;
+import util.GraphPartitioner;
+import util.RawGraph;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainView extends JFrame {
@@ -19,10 +23,10 @@ public class MainView extends JFrame {
     private ArgsTextField k;
     private ArgsTextField x;
     private ImportType importType;
+    private RawGraph currentRaw;
 
-    public MainView() {
-        createMainViewWindow();
-    }
+
+    public MainView() {createMainViewWindow();}
 
     private void createMainViewWindow() {
         // Basic config
@@ -101,13 +105,40 @@ public class MainView extends JFrame {
     private void drawGraph() {
         switch(importType) {
             case DIVIDED -> createImportGraphView((int)Math.ceil(Math.sqrt(maxNode)));
-            case RAW -> throw new UnsupportedOperationException("Not supported yet!");
+            case RAW -> createImportRawGraphView();
         }
+    }
+    // Create view for imported raw view
+    private void createImportRawGraphView() {
+        int kparam = Integer.parseInt(k.getText());
+        double xparam = Double.parseDouble(x.getText());
+        GraphPartitioner p = new GraphPartitioner(currentRaw, kparam, xparam);
+        int[] part = p.partition(5, 10000.0, 0.999);
+        ArrayList<Node> colored = new ArrayList<>(currentRaw.getVertexIndices().length);
+        int[] ind = currentRaw.getVertexIndices();
+        for (int r = 0; r < currentRaw.getRows(); r++) {
+            int start = currentRaw.getRowStarts()[r];
+            int end   = currentRaw.getRowStarts()[r+1];
+            for (int pos = start; pos < end; pos++) {
+                int v = currentRaw.getVertexIndices()[pos];
+                int grp = part[v];
+                colored.add(new Node(r*currentRaw.getRows()+ind[pos]+1, grp));
+            }
+        }
+        currentRaw.setNodes(colored);
+        if(scrollPane != null) {
+            getContentPane().remove(scrollPane);
+        }
+
+        GraphPanel graphPanel = new GraphPanel(currentRaw.getMaxColumns(), currentRaw.getRows(), colored, currentRaw);
+        scrollPane = new MainScrollPane(graphPanel);
+        add(scrollPane, BorderLayout.CENTER);
+        setVisible(true);
     }
 
     // Create view for imported view
     private void createImportGraphView(int size) {
-        GraphPanel graphPanel = new GraphPanel(size, size, nodes);
+        GraphPanel graphPanel = new GraphPanel(size, size, nodes, null);
         scrollPane = new MainScrollPane(graphPanel);
         add(scrollPane, BorderLayout.CENTER);
         setVisible(true);
@@ -157,6 +188,17 @@ public class MainView extends JFrame {
         chooser.setCurrentDirectory(new File("../pgraph/"));
         if(chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
             File file = chooser.getSelectedFile();
+            try {
+                currentRaw = RawGraph.load(file);
+                status.setText(Status.RAW_GRAPH_LOADED.toString());
+                importType = ImportType.RAW;
+                generateButton.setEnabled(true);
+            } catch (IOException ex){
+                JOptionPane.showMessageDialog(this,
+                        "Błąd wczytywania:\n" + ex.getMessage(),
+                        "Błąd", JOptionPane.ERROR_MESSAGE);
+            }
+
         }
     }
 
