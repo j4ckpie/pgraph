@@ -1,14 +1,13 @@
 package view;
 
 import model.Node;
-import util.RawGraph;
+import model.RawGraph;
 import util.ValueHelper;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class GraphPanel extends JPanel {
     private final int COLOR_AMOUNT = 8;
