@@ -110,8 +110,16 @@ public class MainView extends JFrame {
     private void createImportRawGraphView() {
         int kparam = Integer.parseInt(k.getText());
         double xparam = Double.parseDouble(x.getText());
+        if(xparam < 10 || xparam > 100) {
+            status.setText("Status: " + Status.X_OUT_OF_RANGE.toString());
+            return;
+        }
+        if(kparam < 2 || kparam > currentRaw.getN()) {
+            status.setText("Status: " + Status.K_OUT_OF_RANGE.toString());
+            return;
+        }
         GraphPartitioner p = new GraphPartitioner(currentRaw, kparam, xparam);
-        int[] part = p.partition(5, 10000.0, 0.999);
+        int[] part = p.partition(5, 10000.0, 0.999, status);
         colored = new ArrayList<>(currentRaw.getVertexIndices().length);
         int[] ind = currentRaw.getVertexIndices();
         for (int r = 0; r < currentRaw.getRows(); r++) {

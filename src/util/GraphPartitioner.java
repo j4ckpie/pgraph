@@ -1,6 +1,7 @@
 package util;
 
 import model.RawGraph;
+import view.ArgsLabel;
 
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
@@ -19,7 +20,7 @@ public class GraphPartitioner {
         this.maxSize = (int) Math.ceil (avg * (1 + x/100.0));
     }
 
-    public int[] partition(int numStarts, double initialTemp, double coolingRate) {
+    public int[] partition(int numStarts, double initialTemp, double coolingRate, ArgsLabel status) {
         int n = g.getN();
         int bestCut = Integer.MAX_VALUE;
         int[] bestPart = new int[n];
@@ -37,6 +38,7 @@ public class GraphPartitioner {
             }
         }
         System.out.println("Best cut = " + bestCut);
+        status.setText("Status: Best cut = " + bestCut);
         return bestPart;
     }
 
