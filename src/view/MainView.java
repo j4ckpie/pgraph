@@ -5,11 +5,12 @@ import model.Node;
 import model.Status;
 import util.FileReader;
 import util.GraphPartitioner;
-import util.RawGraph;
+import model.RawGraph;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,8 @@ public class MainView extends JFrame {
     private ArgsTextField x;
     private ImportType importType;
     private RawGraph currentRaw;
+    private ArrayList<Node> colored;
+    private MainMenuItem exportRawItem;
 
 
     public MainView() {createMainViewWindow();}
@@ -40,15 +43,12 @@ public class MainView extends JFrame {
         // Create components
         MainMenuBar menuBar = new MainMenuBar();
         MainMenu menu = new MainMenu("pgraph");
-        MainMenu settings = new MainMenu("settings");
         MainMenu help = new MainMenu("help");
         MainMenuItem newItem = new MainMenuItem("new");
         MainMenuItem importDividedItem = new MainMenuItem("import divided");
         MainMenuItem importRawItem = new MainMenuItem("import raw");
+        exportRawItem = new MainMenuItem("export raw");
         MainMenuItem exitItem = new MainMenuItem("exit");
-        MainMenuItem fontSmallItem = new MainMenuItem("font 16pt");
-        MainMenuItem fontMediumItem = new MainMenuItem("font 20pt");
-        MainMenuItem fontLargeItem = new MainMenuItem("font 24pt");
         MainMenuItem aboutItem = new MainMenuItem("about");
         MainMenuItem creditsItem = new MainMenuItem("credits");
         ArgsPanel argsPanel = new ArgsPanel();
@@ -63,14 +63,12 @@ public class MainView extends JFrame {
         menu.add(newItem);
         menu.add(importDividedItem);
         menu.add(importRawItem);
+        menu.add(exportRawItem);
+        exportRawItem.setEnabled(false);
         menu.add(exitItem);
-        settings.add(fontSmallItem);
-        settings.add(fontMediumItem);
-        settings.add(fontLargeItem);
         help.add(aboutItem);
         help.add(creditsItem);
         menuBar.add(menu);
-        menuBar.add(settings);
         menuBar.add(help);
         setJMenuBar(menuBar);
         argsPanel.add(kLabel);
@@ -80,6 +78,8 @@ public class MainView extends JFrame {
         argsPanel.add(x);
         argsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         generateButton.setEnabled(false);
+        k.setEnabled(false);
+        x.setEnabled(false);
         argsPanel.add(generateButton);
         argsPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         argsPanel.add(status);
@@ -89,10 +89,8 @@ public class MainView extends JFrame {
         newItem.addActionListener(e -> newWindow());
         importDividedItem.addActionListener(e -> importDividedGraph());
         importRawItem.addActionListener(e -> importRawGraph());
+        exportRawItem.addActionListener(e -> export(colored));
         exitItem.addActionListener(e -> exitWindow());
-        fontSmallItem.addActionListener(e -> setFontSmall());
-        fontMediumItem.addActionListener(e -> setFontMedium());
-        fontLargeItem.addActionListener(e -> setFontLarge());
         aboutItem.addActionListener(e -> aboutWindow());
         creditsItem.addActionListener(e -> creditsWindow());
         generateButton.addActionListener(e -> drawGraph());
@@ -114,7 +112,7 @@ public class MainView extends JFrame {
         double xparam = Double.parseDouble(x.getText());
         GraphPartitioner p = new GraphPartitioner(currentRaw, kparam, xparam);
         int[] part = p.partition(5, 10000.0, 0.999);
-        ArrayList<Node> colored = new ArrayList<>(currentRaw.getVertexIndices().length);
+        colored = new ArrayList<>(currentRaw.getVertexIndices().length);
         int[] ind = currentRaw.getVertexIndices();
         for (int r = 0; r < currentRaw.getRows(); r++) {
             int start = currentRaw.getRowStarts()[r];
@@ -130,6 +128,7 @@ public class MainView extends JFrame {
             getContentPane().remove(scrollPane);
         }
 
+        exportRawItem.setEnabled(true);
         GraphPanel graphPanel = new GraphPanel(currentRaw.getMaxColumns(), currentRaw.getRows(), colored, currentRaw);
         scrollPane = new MainScrollPane(graphPanel);
         add(scrollPane, BorderLayout.CENTER);
@@ -179,6 +178,7 @@ public class MainView extends JFrame {
             k.setEnabled(false);
             x.setText("");
             x.setEnabled(false);
+            exportRawItem.setEnabled(false);
         }
     }
 
@@ -193,6 +193,30 @@ public class MainView extends JFrame {
                 status.setText(Status.RAW_GRAPH_LOADED.toString());
                 importType = ImportType.RAW;
                 generateButton.setEnabled(true);
+                k.setText("");
+                k.setEnabled(true);
+                x.setText("");
+                x.setEnabled(true);
+            } catch (IOException ex){
+                JOptionPane.showMessageDialog(this,
+                        "Błąd wczytywania:\n" + ex.getMessage(),
+                        "Błąd", JOptionPane.ERROR_MESSAGE);
+            }
+
+        }
+    }
+
+    // Export raw graph divided into parts
+    private void export(List<Node> nodes) {
+        MainFileChooser chooser = new MainFileChooser();
+        chooser.setCurrentDirectory(new File("../pgraph/"));
+        if(chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            try {
+                FileWriter writer = new FileWriter(file, true);
+                for(Node node : nodes) {
+                    writer.write(node.getGroup() + " ");
+                }
             } catch (IOException ex){
                 JOptionPane.showMessageDialog(this,
                         "Błąd wczytywania:\n" + ex.getMessage(),

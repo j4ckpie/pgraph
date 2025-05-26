@@ -1,5 +1,7 @@
 package util;
 
+import model.RawGraph;
+
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 

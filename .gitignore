@@ -3,6 +3,7 @@
 pgraph.iml
 out/
 data/
+data_grupa/
 !**/src/main/**/out/
 !**/src/test/**/out/
 

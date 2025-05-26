@@ -1,16 +1,12 @@
-package util;
+package model;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-
-import model.Node;
 
 public class RawGraph {
     private final int maxColumns;
