@@ -16,4 +16,4 @@ repository/
 `pgraph` is relies heavily on GUI. If you want to know more about how it works, please visit the [`dgraph` repo](https://github.com/j4ckpie/dgraph).
 
 ## Authors
-Created by Jakub Pietrala & Bartosz Starzyński.
+Developed by Jakub Pietrala & Bartosz Starzyński.
